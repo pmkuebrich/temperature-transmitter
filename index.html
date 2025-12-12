@@ -1,245 +1,134 @@
-import React, { useState } from 'react';
-import { Gauge, Activity } from 'lucide-react';
-
-export default function PressureTransmitterSimulator() {
-  const [pressure, setPressure] = useState(50);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pressure Transmitter Simulator (HTML/JS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import { Gauge, Activity } from 'https://cdn.skypack.dev/lucide@latest';
+        // This script block is just to confirm icon availability, but we'll use inline SVG for reliability.
+    </script>
     
-  // Calculate 4-20mA output based on pressure (0-100 PSI)
-  const calculateCurrent = (psi) => {
-    return 4 + (psi / 100) * 16;
-  };
-    
-  const current = calculateCurrent(pressure);
-    
-  // Calculate percentage for visual indicators
-  const percentage = pressure;
-    
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            Pressure Transmitter Simulator
-          </h1>
-          <p className="text-blue-200 text-lg">
-            4-20mA Current Loop Signal Visualization
-          </p>
-        </div>
-        
-        {/* === SLIDER CONTROL MOVED TO THE TOP === */}
-        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl mb-12">
-          <h3 className="text-2xl font-semibold text-white mb-6 text-center">
-            Adjust Pressure Input
-          </h3>
-          
-          <div className="max-w-2xl mx-auto">
-            <input
-              type="range"
-              min="0"
-              max="100"
-              step="0.1"
-              value={pressure}
-              onChange={(e) => setPressure(parseFloat(e.target.value))}
-              className="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
-              style={{
-                background: `linear-gradient(to right, #3b82f6 0%, #06b6d4 ${percentage}%, #334155 ${percentage}%, #334155 100%)`
-              }}
-            />
-            
-            <div className="flex justify-between text-blue-200 text-sm mt-2">
-              <span>0 PSI / 4 mA</span>
-              <span>50 PSI / 12 mA</span>
-              <span>100 PSI / 20 mA</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Main Content (Pressure Input and Current Output Side-by-Side) */}
-        {/* The grid layout keeps them side-by-side on medium screens and larger */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Pressure Gauge (Left Column) */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
-            <div className="flex items-center justify-center mb-6">
-              <Gauge className="w-8 h-8 text-blue-300 mr-3" />
-              <h2 className="text-2xl font-semibold text-white">Pressure Input</h2>
-            </div>
-            
-            {/* Analog Gauge Visualization */}
-            <div className="relative w-64 h-64 mx-auto mb-6">
-              <svg viewBox="0 0 200 200" className="w-full h-full">
-                {/* Gauge Background */}
-                <circle cx="100" cy="100" r="90" fill="#1e293b" stroke="#475569" strokeWidth="2"/>
-                
-                {/* Gauge Arc Background */}
-                <path
-                  d="M 30 100 A 70 70 0 1 1 170 100"
-                  fill="none"
-                  stroke="#334155"
-                  strokeWidth="20"
-                  strokeLinecap="round"
-                />
-                
-                {/* Gauge Arc Fill */}
-                <path
-                  d="M 30 100 A 70 70 0 1 1 170 100"
-                  fill="none"
-                  stroke="url(#gaugeGradient)"
-                  strokeWidth="20"
-                  strokeLinecap="round"
-                  strokeDasharray={`${(percentage / 100) * 220} 220`}
-                />
-                
-                {/* Gradient Definition */}
-                <defs>
-                  <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#06b6d4" />
-                  </linearGradient>
-                </defs>
-                
-                {/* Center Circle */}
-                <circle cx="100" cy="100" r="60" fill="#0f172a" stroke="#475569" strokeWidth="2"/>
-                
-                {/* Scale Markers */}
-                {[0, 25, 50, 75, 100].map((val, i) => {
-                  const angle = -180 + (val / 100) * 180;
-                  const rad = (angle * Math.PI) / 180;
-                  const x1 = 100 + 75 * Math.cos(rad);
-                  const y1 = 100 + 75 * Math.sin(rad);
-                  const x2 = 100 + 85 * Math.cos(rad);
-                  const y2 = 100 + 85 * Math.sin(rad);
-                  return (
-                    <line
-                      key={i}
-                      x1={x1}
-                      y1={y1}
-                      x2={x2}
-                      y2={y2}
-                      stroke="#64748b"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  );
-                })}
-                
-                {/* Needle */}
-                <line
-                  x1="100"
-                  y1="100"
-                  x2={100 + 50 * Math.cos(((-180 + (percentage / 100) * 180) * Math.PI) / 180)}
-                  y2={100 + 50 * Math.sin(((-180 + (percentage / 100) * 180) * Math.PI) / 180)}
-                  stroke="#ef4444"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <circle cx="100" cy="100" r="5" fill="#ef4444" />
-              </svg>
-              
-              {/* Scale Labels */}
-              <div className="absolute top-[85%] left-[10%] text-blue-300 text-xs">0</div>
-              <div className="absolute top-[85%] right-[10%] text-blue-300 text-xs">100</div>
-              <div className="absolute top-[45%] left-1/2 transform -translate-x-1/2 text-blue-200 text-xs">PSI</div>
-            </div>
-            
-            {/* Digital Display */}
-            <div className="bg-black/50 rounded-lg p-4 text-center border border-blue-500/30">
-              <div className="text-5xl font-bold text-cyan-400 font-mono">
-                {pressure.toFixed(1)}
-              </div>
-              <div className="text-blue-300 text-sm mt-1">PSI</div>
-            </div>
-          </div>
-          
-          {/* Controller/Display (Right Column) */}
-          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
-            <div className="flex items-center justify-center mb-6">
-              <Activity className="w-8 h-8 text-green-300 mr-3" />
-              <h2 className="text-2xl font-semibold text-white">Current Output</h2>
-            </div>
-            
-            {/* Controller Display */}
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 mb-6 border-4 border-slate-700 shadow-inner">
-              {/* LED Indicator */}
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-lg shadow-green-500/50 mr-2"></div>
-                <span className="text-green-300 text-sm">ACTIVE</span>
-              </div>
-              
-              {/* Current Display */}
-              <div className="bg-black rounded-lg p-6 mb-4 border border-green-900/50">
-                <div className="text-6xl font-bold text-green-400 font-mono text-center">
-                  {current.toFixed(2)}
-                </div>
-                <div className="text-green-300 text-center mt-2">mA</div>
-              </div>
-              
-              {/* Bar Graph */}
-              <div className="bg-black/50 rounded-lg p-4 border border-slate-600">
-                <div className="text-green-300 text-xs mb-2 text-center">Signal Strength</div>
-                <div className="w-full h-8 bg-slate-800 rounded-full overflow-hidden border border-slate-600">
-                  <div
-                    className="h-full bg-gradient-to-r from-green-500 to-cyan-400 transition-all duration-300 ease-out"
-                    style={{ width: `${((current - 4) / 16) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-slate-400 mt-1">
-                  <span>4mA</span>
-                  <span>12mA</span>
-                  <span>20mA</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Calculation Info */}
-            <div className="bg-blue-900/30 rounded-lg p-4 border border-blue-500/30">
-              <h3 className="text-white font-semibold mb-2 text-sm">Conversion Formula:</h3>
-              <div className="text-blue-200 text-sm font-mono">
-                $I = 4 + \left(\frac{P}{100}\right) \times 16$
-              </div>
-              <div className="text-blue-300 text-xs mt-2">
-                where P = pressure (0-100 PSI)<br/>
-                and I = current (4-20 mA)
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Information Panel */}
-        <div className="mt-8 bg-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10">
-          <h3 className="text-xl font-semibold text-white mb-3">About 4-20mA Current Loop</h3>
-          <p className="text-blue-200 text-sm leading-relaxed">
-            The 4-20mA current loop is an industry-standard analog signal used in process control. 
-            The transmitter converts the physical measurement (pressure) into a proportional current signal. 
-            4mA represents 0% of range (0 PSI), while 20mA represents 100% of range (100 PSI). 
-            This signal standard is preferred because current signals are less susceptible to electrical noise 
-            and voltage drops over long cable runs compared to voltage signals.
-          </p>
-        </div>
-      </div>
-      
-      <style jsx>{`
+    <style>
+        /* Custom Styles for Slider Thumb (Mimicking the JSX/CSS approach) */
         .slider::-webkit-slider-thumb {
-          appearance: none;
-          width: 24px;
-          height: 24px;
-          background: linear-gradient(135deg, #06b6d4, #3b82f6);
-          cursor: pointer;
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         
         .slider::-moz-range-thumb {
-          width: 24px;
-          height: 24px;
-          background: linear-gradient(135deg, #06b6d4, #3b82f6);
-          cursor: pointer;
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
-      `}</style>
-    </div>
-  );
-}
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                Pressure Transmitter Simulator
+            </h1>
+            <p class="text-blue-200 text-lg">
+                4-20mA Current Loop Signal Visualization
+            </p>
+        </div>
+        
+        <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl mb-12">
+            <h3 class="text-2xl font-semibold text-white mb-6 text-center">
+                Adjust Pressure Input
+            </h3>
+            
+            <div class="max-w-2xl mx-auto">
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value="50"
+                    id="pressureSlider"
+                    class="w-full h-3 bg-slate-700 rounded-lg appearance-none cursor-pointer slider"
+                    
+                />
+                
+                <div class="flex justify-between text-blue-200 text-sm mt-2">
+                    <span>0 PSI / 4 mA</span>
+                    <span>50 PSI / 12 mA</span>
+                    <span>100 PSI / 20 mA</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
+                <div class="flex items-center justify-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-blue-300 mr-3"><path d="M12 14v4"/><path d="M12 2a10 10 0 1 0 10 10c0-1.4-0.6-2.8-1.7-3.8"/><path d="M7 16l-1 2"/><path d="M17 16l1 2"/><path d="M10 5l-1 1"/><path d="M14 5l1 1"/></svg>
+                    <h2 class="text-2xl font-semibold text-white">Pressure Input</h2>
+                </div>
+                
+                <div class="relative w-64 h-64 mx-auto mb-6">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <circle cx="100" cy="100" r="90" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+                        
+                        <path
+                            d="M 30 100 A 70 70 0 1 1 170 100"
+                            fill="none"
+                            stroke="#334155"
+                            stroke-width="20"
+                            stroke-linecap="round"
+                        />
+                        
+                        <path
+                            id="gaugeArcFill"
+                            d="M 30 100 A 70 70 0 1 1 170 100"
+                            fill="none"
+                            stroke="url(#gaugeGradient)"
+                            stroke-width="20"
+                            stroke-linecap="round"
+                            stroke-dasharray="110 220"
+                        />
+                        
+                        <defs>
+                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#3b82f6" />
+                                <stop offset="100%" stop-color="#06b6d4" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <circle cx="100" cy="100" r="60" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+                        
+                        <path d="M 30 100 L 40 100" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M 64.7 127.3 L 74.7 137.3" transform="rotate(270 100 100) translate(0 0)" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M 100 170 L 100 180" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M 135.3 127.3 L 125.3 137.3" transform="rotate(90 100 100) translate(0 0)" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M 170 100 L 160 100" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+
+                        
+                        <line
+                            id="gaugeNeedle"
+                            x1="100"
+                            y1="100"
+                            x2="150"
+                            y2="100"
+                            stroke="#ef4444"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                        />
+                        <circle cx="100" cy="100" r="5" fill="#ef4444" />
+                    </svg>
+                    
+                    <div class="absolute top-[85%] left-[10%] text-blue-300 text-xs">0</div>
+                    <div class="absolute top-[85%] right-[10%] text-blue-300
